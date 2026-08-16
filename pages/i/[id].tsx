@@ -131,7 +131,7 @@ const Page: NextPage<PageProps> = ({ share, shareId }) => {
               </div>
 
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${BRAND.line}`, paddingTop: 16 }}>
-                <span style={{ fontWeight: 700, fontSize: 16 }}>Total</span>
+                <span style={{ fontFamily: FONT_DISPLAY, fontSize: 20 }}>Total</span>
                 <span style={{ fontFamily: FONT_DISPLAY, fontSize: 32, letterSpacing: 0.5, color: accentColor }}>
                   {formatNaira(share.total, "code")}
                 </span>
