@@ -15,7 +15,10 @@ const BRAND = {
   amberStrong: "#B7791F",
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.yousual.ng";
+const FONT_DISPLAY = "'Bebas Neue', Impact, sans-serif";
+const FONT_BODY = "'Inter', system-ui, sans-serif";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://thetobiallen.pythonanywhere.com";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://yousual.ng";
 
 interface ShareItem {
@@ -45,7 +48,12 @@ interface PageProps {
 }
 
 const docLabel = (status: string) => (status === "paid" ? "Receipt" : "Invoice");
-const formatNaira = (n: number) => `₦${Number(n || 0).toLocaleString("en-NG")}`;
+// const formatNaira = (n: number) => `₦${Number(n || 0).toLocaleString("en-NG")}`;
+
+const formatNaira = (n: number, currency: "symbol" | "code" = "symbol"): string => {
+  const amount = Number(n || 0).toLocaleString("en-NG");
+  return currency === "code" ? `NGN ${amount}` : `₦${amount}`;
+};
 
 const Page: NextPage<PageProps> = ({ share, shareId }) => {
   const pageUrl = `${APP_URL}/i/${shareId}`;
@@ -68,6 +76,12 @@ const Page: NextPage<PageProps> = ({ share, shareId }) => {
     <>
       <Head>
         <title>{ogTitle}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Yousual" />
         <meta property="og:title" content={ogTitle} />
@@ -82,8 +96,8 @@ const Page: NextPage<PageProps> = ({ share, shareId }) => {
         <meta name="twitter:image" content={`${APP_URL}/og-image.png`} />
       </Head>
 
-      <div style={{ background: BRAND.bg, minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: BRAND.ink }}>
-        <div style={{ maxWidth: 420, margin: "0 auto", padding: "48px 24px" }}>
+      <div style={{ background: BRAND.bg, minHeight: "100vh", fontFamily: FONT_BODY, color: BRAND.ink }}>
+        <div style={{ maxWidth: 560, margin: "0 auto", padding: "48px 24px" }}>
           {!share ? (
             <p style={{ textAlign: "center", fontSize: 14, color: BRAND.inkSoft }}>
               This invoice link doesn&apos;t exist or has expired.
@@ -94,7 +108,9 @@ const Page: NextPage<PageProps> = ({ share, shareId }) => {
                 <div style={{ fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5, color: BRAND.inkSoft, marginBottom: 4 }}>
                   {docLabel(share.status)} · {share.invoiceNumber}
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 700, color: accentColor }}>{share.businessName}</div>
+                <div style={{ fontFamily: FONT_DISPLAY, fontSize: 32, letterSpacing: 0.5, color: accentColor }}>
+                  {share.businessName}
+                </div>
                 <div style={{ fontSize: 12, color: BRAND.inkSoft, marginTop: 4 }}>
                   {share.status === "paid" ? `Paid ${share.paidDate || share.createdAt}` : `Issued ${share.createdAt}`}
                 </div>
@@ -114,14 +130,12 @@ const Page: NextPage<PageProps> = ({ share, shareId }) => {
                 ))}
               </div>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${BRAND.line}`, paddingTop: 16, fontWeight: 700, fontSize: 22 }}>
-                <span>Total</span>
-                <span style={{ color: accentColor }}>{formatNaira(share.total)}</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${BRAND.line}`, paddingTop: 16 }}>
+                <span style={{ fontWeight: 700, fontSize: 16 }}>Total</span>
+                <span style={{ fontFamily: FONT_DISPLAY, fontSize: 32, letterSpacing: 0.5, color: accentColor }}>
+                  {formatNaira(share.total, "code")}
+                </span>
               </div>
-
-              {share.note && (
-                <div style={{ marginTop: 12, fontSize: 13, color: BRAND.inkSoft, whiteSpace: "pre-wrap" }}>{share.note}</div>
-              )}
 
               <div style={{ textAlign: "center", marginTop: 16 }}>
                 {share.status === "paid" && (
@@ -130,7 +144,7 @@ const Page: NextPage<PageProps> = ({ share, shareId }) => {
                 {share.status === "partially_paid" && (
                   <>
                     <span style={{ fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 999, background: BRAND.amber, color: BRAND.amberStrong }}>PARTIALLY PAID</span>
-                    <div style={{ fontSize: 13, color: BRAND.inkSoft, marginTop: 8 }}>
+                    <div style={{ fontSize: 13, color: BRAND.inkSoft, marginTop: 16, marginBottom: 16 }}>
                       {formatNaira(share.amountPaid)} paid · {formatNaira(share.amountDue)} outstanding
                     </div>
                   </>
@@ -139,9 +153,17 @@ const Page: NextPage<PageProps> = ({ share, shareId }) => {
                   <span style={{ fontSize: 12, fontWeight: 700, padding: "4px 12px", borderRadius: 999, background: BRAND.peach, color: BRAND.red }}>OUTSTANDING</span>
                 )}
               </div>
+
+              {share.note && (
+                <div style={{ borderBottom: `1px solid ${BRAND.line}`, paddingBottom: 24 }}>
+                    <div style={{ fontFamily: FONT_DISPLAY, fontSize: 18, color: "#374151" }}>Note:</div>
+                    <div style={{ marginTop: 4, fontSize: 14, lineHeight: 1.5, color: BRAND.inkSoft, whiteSpace: "pre-wrap" }}>{share.note}</div>
+                </div>
+              )}
+
+             <p style={{ textAlign: "center", fontSize: 14, color: BRAND.inkSoft, marginTop: 24 }}>Powered by Yousual</p>
             </div>
           )}
-          <p style={{ textAlign: "center", fontSize: 12, color: BRAND.inkSoft, marginTop: 24 }}>Powered by Yousual</p>
         </div>
       </div>
     </>
